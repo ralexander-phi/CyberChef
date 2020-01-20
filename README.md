@@ -3,7 +3,6 @@
 [![Build Status](https://travis-ci.org/gchq/CyberChef.svg?branch=master)](https://travis-ci.org/gchq/CyberChef)
 [![dependencies Status](https://david-dm.org/gchq/CyberChef/status.svg)](https://david-dm.org/gchq/CyberChef)
 [![npm](https://img.shields.io/npm/v/cyberchef.svg)](https://www.npmjs.com/package/cyberchef)
-![](https://reposs.herokuapp.com/?path=gchq/CyberChef&color=blue)
 [![](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/gchq/CyberChef/blob/master/LICENSE)
 [![Gitter](https://badges.gitter.im/gchq/CyberChef.svg)](https://gitter.im/gchq/CyberChef?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
@@ -70,16 +69,28 @@ You can use as many operations as you like in simple or complex ways. Some examp
      - You can save the output to a file at any time or load a file by dragging and dropping it into the input field. Files up to around 2GB are supported (depending on your browser), however some operations may take a very long time to run over this much data.
  - CyberChef is entirely client-side
      - It should be noted that none of your recipe configuration or input (either text or files) is ever sent to the CyberChef web server - all processing is carried out within your browser, on your own computer.
-     - Due to this feature, CyberChef can be compiled into a single HTML file. You can download this file and drop it into a virtual machine, share it with other people, or use it independently on your local machine.
+     - Due to this feature, CyberChef can be downloaded and run locally. You can use the link in the top left corner of the app to download a full copy of CyberChef and drop it into a virtual machine, share it with other people, or host it in a closed network.
+
+
+## Deep linking
+
+By manipulation of CyberChef's URL hash, you can change the initial settings with which the page opens.
+The format is `https://gchq.github.io/CyberChef/#recipe=Operation()&input=...`
+
+Supported arguments are `recipe`, `input` (encoded in Base64), and `theme`. 
 
 
 ## Browser support
 
 CyberChef is built to support
 
- - Google Chrome 40+
- - Mozilla Firefox 35+
- - Microsoft Edge 14+
+ - Google Chrome 50+
+ - Mozilla Firefox 38+
+
+
+## Node.js support
+
+CyberChef is built to fully support Node.js `v10` and partially supports `v12`. Named imports using a deep import specifier does not work in `v12`. For more information, see the Node API page in the project [wiki pages](https://github.com/gchq/CyberChef/wiki)
 
 
 ## Contributing

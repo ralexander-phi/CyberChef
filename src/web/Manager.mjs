@@ -197,6 +197,7 @@ class Manager {
         this.addMultiEventListener("#output-text", "mousedown dblclick select",  this.highlighter.outputMousedown, this.highlighter);
         this.addMultiEventListener("#output-html", "mousedown dblclick select",  this.highlighter.outputHtmlMousedown, this.highlighter);
         this.addDynamicListener("#output-file-download", "click", this.output.downloadFile, this.output);
+        this.addDynamicListener("#output-file-show-all", "click", this.output.showAllFile, this.output);
         this.addDynamicListener("#output-file-slice i", "click", this.output.displayFileSlice, this.output);
         document.getElementById("show-file-overlay").addEventListener("click", this.output.showFileOverlayClick.bind(this.output));
         this.addDynamicListener(".extract-file,.extract-file i", "click", this.output.extractFileClick, this.output);
@@ -224,7 +225,7 @@ class Manager {
         document.getElementById("options").addEventListener("click", this.options.optionsClick.bind(this.options));
         document.getElementById("reset-options").addEventListener("click", this.options.resetOptionsClick.bind(this.options));
         this.addDynamicListener(".option-item input[type=checkbox]", "change", this.options.switchChange, this.options);
-        this.addDynamicListener(".option-item input[type=checkbox]", "change", this.options.setWordWrap, this.options);
+        this.addDynamicListener(".option-item input[type=checkbox]#wordWrap", "change", this.options.setWordWrap, this.options);
         this.addDynamicListener(".option-item input[type=checkbox]#useMetaKey", "change", this.bindings.updateKeybList, this.bindings);
         this.addDynamicListener(".option-item input[type=number]", "keyup", this.options.numberChange, this.options);
         this.addDynamicListener(".option-item input[type=number]", "change", this.options.numberChange, this.options);

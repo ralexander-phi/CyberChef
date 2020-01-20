@@ -29,7 +29,7 @@
         <meta name="description" content="The Cyber Swiss Army Knife - a web app for encryption, encoding, compression and data analysis" />
         <meta name="keywords" content="base64, hex, decode, encode, encrypt, decrypt, compress, decompress, regex, regular expressions, hash, crypt, hexadecimal, user agent, url, certificate, x.509, parser, JSON, gzip,  md5, sha1, aes, des, blowfish, xor" />
 
-        <link rel="icon" type="image/ico" href="<%- require('../static/images/favicon.ico') %>" />
+        <link rel="icon" type="image/ico" href="<%- require('../static/images/favicon.ico').default %>" />
 
         <script type="application/javascript">
             "use strict";
@@ -123,9 +123,9 @@
                 document.getElementById("preloader-error").innerHTML =
                     "CyberChef encountered an error while loading.<br><br>" +
                     "The following browser versions are supported:" +
-                    "<ul><li>Google Chrome 40+</li><li>Mozilla Firefox 35+</li><li>Microsoft Edge 14+</li></ul>" +
+                    "<ul><li>Google Chrome 50+</li><li>Mozilla Firefox 38+</li></ul>" +
                     "Your user agent is:<br>" + escapeHtml(navigator.userAgent) + "<br><br>" +
-                    "If your browser is supported, please <a href='https://github.com/gchq/CyberChef/issues/new'>" +
+                    "If your browser is supported, please <a href='https://github.com/gchq/CyberChef/issues/new/choose'>" +
                     "raise an issue</a> including the following details:<br><br>" +
                     "<pre>" + escapeHtml(msg) + "</pre>";
             };
@@ -168,7 +168,7 @@
             <div id="workspace-wrapper">
                 <div id="operations" class="split split-horizontal no-select">
                     <div class="title no-select">Operations</div>
-                    <input id="search" type="search" class="form-control" placeholder="Search..." autocomplete="off">
+                    <input id="search" type="search" class="form-control" placeholder="Search..." autocomplete="off" tabindex="2">
                     <ul id="search-results" class="op-list"></ul>
                     <div id="categories" class="panel-group no-select"></div>
                 </div>
@@ -197,7 +197,7 @@
                             </button>
 
                             <button type="button" class="mx-2 btn btn-lg btn-success btn-raised btn-block" id="bake">
-                                <img aria-hidden="true" src="<%- require('../static/images/cook_male-32x32.png') %>" alt="Chef Icon"/>
+                                <img aria-hidden="true" src="<%- require('../static/images/cook_male-32x32.png').default %>" alt="Chef Icon"/>
                                 <span>Bake!</span>
                             </button>
 
@@ -266,12 +266,12 @@
                         </div>
                         <div class="textarea-wrapper no-select input-wrapper" id="input-wrapper">
                             <div id="input-highlighter" class="no-select"></div>
-                            <textarea id="input-text" class="input-text" spellcheck="false"></textarea>
+                            <textarea id="input-text" class="input-text" spellcheck="false" tabindex="1" autofocus></textarea>
                             <div class="input-file" id="input-file">
                                 <div class="file-overlay" id="file-overlay"></div>
                                 <div style="position: relative; height: 100%;">
                                     <div class="io-card card">
-                                        <img aria-hidden="true" src="<%- require('../static/images/file-128x128.png') %>" alt="File icon" id="input-file-thumbnail"/>
+                                        <img aria-hidden="true" src="<%- require('../static/images/file-128x128.png').default %>" alt="File icon" id="input-file-thumbnail"/>
                                         <div class="card-body">
                                             <button type="button" class="close" id="input-file-close">&times;</button>
                                             Name: <span id="input-file-name"></span><br>
@@ -346,24 +346,26 @@
                                 <div id="output-highlighter" class="no-select"></div>
                                 <div id="output-html"></div>
                                 <textarea id="output-text" readonly="readonly" spellcheck="false"></textarea>
-                                <img id="show-file-overlay" aria-hidden="true" src="<%- require('../static/images/file-32x32.png') %>" alt="Show file overlay" title="Show file overlay"/>
+                                <img id="show-file-overlay" aria-hidden="true" src="<%- require('../static/images/file-32x32.png').default %>" alt="Show file overlay" title="Show file overlay"/>
                                 <div id="output-file">
                                     <div class="file-overlay"></div>
                                     <div style="position: relative; height: 100%;">
                                         <div class="io-card card">
-                                            <img aria-hidden="true" src="<%- require('../static/images/file-128x128.png') %>" alt="File icon"/>
+                                            <img aria-hidden="true" src="<%- require('../static/images/file-128x128.png').default %>" alt="File icon"/>
                                             <div class="card-body">
                                                 Size: <span id="output-file-size"></span><br>
                                                 <button id="output-file-download" type="button" class="btn btn-primary btn-outline">Download</button>
+                                                <button id="output-file-show-all" type="button" class="btn btn-warning btn-outline" data-toggle="tooltip" title="Warning: This could crash your browser. Use at your own risk.">Show all</button>
                                                 <div class="input-group">
-                                                    <span class="input-group-btn">
-                                                        <button id="output-file-slice" type="button" class="btn btn-secondary bmd-btn-icon" title="View slice">
+                                                    <span class="input-group-prepend">
+                                                        <button id="output-file-slice" type="button" class="btn btn-secondary bmd-btn-icon" data-toggle="tooltip" title="View slice">
                                                             <i class="material-icons">search</i>
                                                         </button>
                                                     </span>
-                                                    <input type="number" class="form-control" id="output-file-slice-from" placeholder="From" value="0" step="1024" min="0">
+                                                    <input type="number" class="form-control" id="output-file-slice-from" placeholder="From" value="0" step="128" min="0">
                                                     <div class="input-group-addon">to</div>
-                                                    <input type="number" class="form-control" id="output-file-slice-to" placeholder="To" value="2048" step="1024" min="0">
+                                                    <input type="number" class="form-control" id="output-file-slice-to" placeholder="To" value="256" step="128" min="0">
+                                                    <div class="input-group-addon">KiB</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -382,7 +384,7 @@
             </div>
         </div>
 
-        <div class="modal" id="save-modal" tabindex="-1" role="dialog">
+        <div class="modal fade" id="save-modal" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -442,7 +444,7 @@
             </div>
         </div>
 
-        <div class="modal" id="load-modal" tabindex="-1" role="dialog">
+        <div class="modal fade" id="load-modal" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -469,7 +471,7 @@
             </div>
         </div>
 
-        <div class="modal" id="options-modal" tabindex="-1" role="dialog">
+        <div class="modal fade" id="options-modal" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -486,6 +488,15 @@
                                 <option value="geocities">GeoCities</option>
                                 <option value="solarizedDark">Solarized Dark</option>
                                 <option value="solarizedLight">Solarized Light</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group option-item">
+                            <label for="preserveCR" class="bmd-label-floating"> Preserve carriage returns (0x0d)</label>
+                            <select class="form-control" option="preserveCR" id="preserveCR" data-toggle="tooltip" data-placement="bottom" data-offset="-10%" data-html="true" title="HTML textareas don't support carriage returns, so if we want to preserve them in our input, we have to disable editing.<br><br>The default option is to only do this for high-entropy inputs, but you can force the choice using this dropdown.">
+                                <option value="entropy">For high-entropy inputs</option>
+                                <option value="always">Always</option>
+                                <option value="never">Never</option>
                             </select>
                         </div>
 
@@ -563,16 +574,16 @@
                         <div class="checkbox option-item">
                             <label for="imagePreview">
                                 <input type="checkbox" option="imagePreview" id="imagePreview">
-                                Render a preview of the input if it's detected to be an image.
+                                Render a preview of the input if it's detected to be an image
                             </label>
                         </div>
 
                         <div class="checkbox option-item">
-                                <label for="syncTabs">
-                                    <input type="checkbox" option="syncTabs" id="syncTabs">
-                                    Keep the current tab in sync between the input and output.
-                                </label>
-                            </div>
+                            <label for="syncTabs">
+                                <input type="checkbox" option="syncTabs" id="syncTabs">
+                                Keep the current tab in sync between the input and output
+                            </label>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" id="reset-options">Reset options to default</button>
@@ -582,7 +593,7 @@
             </div>
         </div>
 
-        <div class="modal" id="favourites-modal" tabindex="-1" role="dialog">
+        <div class="modal fade" id="favourites-modal" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -608,14 +619,14 @@
             </div>
         </div>
 
-        <div class="modal" id="support-modal" tabindex="-1" role="dialog">
+        <div class="modal fade" id="support-modal" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">CyberChef - The Cyber Swiss Army Knife</h5>
                     </div>
                     <div class="modal-body">
-                        <img aria-hidden="true" class="about-img-left" src="<%- require('../static/images/cyberchef-128x128.png') %>" alt="CyberChef Logo"/>
+                        <img aria-hidden="true" class="about-img-left" src="<%- require('../static/images/cyberchef-128x128.png').default %>" alt="CyberChef Logo"/>
                         <p class="subtext">
                             Version <%=  htmlWebpackPlugin.options.version %><br>
                             Compile time: <%= htmlWebpackPlugin.options.compileTime %>
@@ -702,7 +713,7 @@
                                 <br>
                                 <pre id="report-bug-info"></pre>
                                 <br>
-                                <a class="btn btn-primary" href="https://github.com/gchq/CyberChef/issues/new" role="button">Raise issue on GitHub</a>
+                                <a class="btn btn-primary" href="https://github.com/gchq/CyberChef/issues/new/choose" role="button">Raise issue on GitHub</a>
                             </div>
                             <div role="tabpanel" class="tab-pane" id="about" style="padding: 20px;">
                                 <h5><strong>What</strong></h5>
@@ -738,13 +749,13 @@
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                     <a href="https://github.com/gchq/CyberChef">
-                        <img aria-hidden="true" style="position: absolute; top: 0; right: 0; border: 0;" src="<%- require('../static/images/fork_me.png') %>" alt="Fork me on GitHub">
+                        <img aria-hidden="true" style="position: absolute; top: 0; right: 0; border: 0;" src="<%- require('../static/images/fork_me.png').default %>" alt="Fork me on GitHub">
                     </a>
                 </div>
             </div>
         </div>
 
-        <div class="modal" id="confirm-modal" tabindex="-1" role="dialog">
+        <div class="modal fade" id="confirm-modal" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -763,7 +774,7 @@
             </div>
         </div>
 
-        <div class="modal" id="input-tab-modal" tabindex="-1" role="dialog">
+        <div class="modal fade" id="input-tab-modal" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -822,7 +833,7 @@
             </div>
         </div>
 
-        <div class="modal" id="output-tab-modal" tabindex="-1" role="dialog">
+        <div class="modal fade" id="output-tab-modal" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">

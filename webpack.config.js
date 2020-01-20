@@ -1,5 +1,6 @@
 const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
 
 /**
@@ -50,6 +51,13 @@ module.exports = {
         new MiniCssExtractPlugin({
             filename: "assets/[name].css"
         }),
+        new CopyWebpackPlugin([
+            {
+                context: "src/core/vendor/",
+                from: "tesseract/**/*",
+                to: "assets/"
+            }
+        ])
     ],
     resolve: {
         alias: {
@@ -103,11 +111,17 @@ module.exports = {
                     "sass-loader",
                 ]
             },
+            /**
+             * The limit for these files has been increased to 60,000 (60KB)
+             * to ensure the material icons font is inlined.
+             *
+             * See: https://github.com/gchq/CyberChef/issues/612
+             */
             {
                 test: /\.(ico|eot|ttf|woff|woff2)$/,
                 loader: "url-loader",
                 options: {
-                    limit: 10000,
+                    limit: 60000,
                     name: "[hash].[ext]",
                     outputPath: "assets"
                 }

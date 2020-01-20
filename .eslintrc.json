@@ -43,9 +43,11 @@
 
         // stylistic conventions
         "brace-style": ["error", "1tbs"],
+        "space-before-blocks": ["error", "always"],
         "block-spacing": "error",
         "array-bracket-spacing": "error",
         "comma-spacing": "error",
+        "spaced-comment": ["error", "always", { "exceptions": ["/"] } ],
         "comma-style": "error",
         "computed-property-spacing": "error",
         "no-trailing-spaces": "warn",

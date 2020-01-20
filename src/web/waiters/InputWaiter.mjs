@@ -5,9 +5,9 @@
  * @license Apache-2.0
  */
 
-import LoaderWorker from "worker-loader?inline&fallback=false!../workers/LoaderWorker";
-import InputWorker from "worker-loader?inline&fallback=false!../workers/InputWorker";
-import Utils from "../../core/Utils.mjs";
+import LoaderWorker from "worker-loader?inline&fallback=false!../workers/LoaderWorker.js";
+import InputWorker from "worker-loader?inline&fallback=false!../workers/InputWorker.mjs";
+import Utils, { debounce } from "../../core/Utils.mjs";
 import { toBase64 } from "../../core/lib/Base64.mjs";
 import { isImage } from "../../core/lib/FileType.mjs";
 
@@ -29,20 +29,20 @@ class InputWaiter {
 
         // Define keys that don't change the input so we don't have to autobake when they are pressed
         this.badKeys = [
-            16, //Shift
-            17, //Ctrl
-            18, //Alt
-            19, //Pause
-            20, //Caps
-            27, //Esc
-            33, 34, 35, 36, //PgUp, PgDn, End, Home
-            37, 38, 39, 40, //Directional
-            44, //PrntScrn
-            91, 92, //Win
-            93, //Context
-            112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, //F1-12
-            144, //Num
-            145, //Scroll
+            16, // Shift
+            17, // Ctrl
+            18, // Alt
+            19, // Pause
+            20, // Caps
+            27, // Esc
+            33, 34, 35, 36, // PgUp, PgDn, End, Home
+            37, 38, 39, 40, // Directional
+            44, // PrntScrn
+            91, 92, // Win
+            93, // Context
+            112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, // F1-12
+            144, // Num
+            145, // Scroll
         ];
 
         this.inputWorker = null;
@@ -222,8 +222,6 @@ class InputWaiter {
         if (Object.prototype.hasOwnProperty.call(r, "progress") &&
             Object.prototype.hasOwnProperty.call(r, "inputNum")) {
             this.manager.tabs.updateInputTabProgress(r.inputNum, r.progress, 100);
-        } else if (Object.prototype.hasOwnProperty.call(r, "fileBuffer")) {
-            this.manager.tabs.updateInputTabProgress(r.inputNum, 100, 100);
         }
 
         const transferable = Object.prototype.hasOwnProperty.call(r, "fileBuffer") ? [r.fileBuffer] : undefined;
@@ -272,7 +270,7 @@ class InputWaiter {
                 this.showLoadingInfo(r.data, true);
                 break;
             case "setInput":
-                this.app.debounce(this.set, 50, "setInput", this, [r.data.inputObj, r.data.silent])();
+                debounce(this.set, 50, "setInput", this, [r.data.inputObj, r.data.silent])();
                 break;
             case "inputAdded":
                 this.inputAdded(r.data.changeTab, r.data.inputNum);
@@ -305,6 +303,9 @@ class InputWaiter {
             case "removeChefWorker":
                 this.removeChefWorker();
                 break;
+            case "fileLoaded":
+                this.fileLoaded(r.data.inputNum);
+                break;
             default:
                 log.error(`Unknown action ${r.action}.`);
         }
@@ -315,7 +316,7 @@ class InputWaiter {
      */
     bakeAll() {
         this.app.progress = 0;
-        this.app.debounce(this.manager.controls.toggleBakeButtonFunction, 20, "toggleBakeButton", this, ["loading"]);
+        debounce(this.manager.controls.toggleBakeButtonFunction, 20, "toggleBakeButton", this, ["loading"]);
         this.inputWorker.postMessage({
             action: "bakeAll"
         });
@@ -331,7 +332,7 @@ class InputWaiter {
      * @param {number} inputData.size - The size in bytes of the input file
      * @param {string} inputData.type - The MIME type of the input file
      * @param {number} inputData.progress - The load progress of the input file
-     * @param {boolean} [silent=false] - If true, fires the manager statechange event
+     * @param {boolean} [silent=false] - If false, fires the manager statechange event
      */
     async set(inputData, silent=false) {
         return new Promise(function(resolve, reject) {
@@ -373,7 +374,7 @@ class InputWaiter {
 
                 if (!silent) window.dispatchEvent(this.manager.statechange);
             } else {
-                this.setFile(inputData);
+                this.setFile(inputData, silent);
             }
 
         }.bind(this));
@@ -389,8 +390,9 @@ class InputWaiter {
      * @param {number} inputData.size - The size in bytes of the input file
      * @param {string} inputData.type - The MIME type of the input file
      * @param {number} inputData.progress - The load progress of the input file
+     * @param {boolean} [silent=true] - If false, fires the manager statechange event
      */
-    setFile(inputData) {
+    setFile(inputData, silent=true) {
         const activeTab = this.manager.tabs.getActiveInputTab();
         if (inputData.inputNum !== activeTab) return;
 
@@ -414,6 +416,30 @@ class InputWaiter {
 
         this.setInputInfo(inputData.size, null);
         this.displayFilePreview(inputData);
+
+        if (!silent) window.dispatchEvent(this.manager.statechange);
+    }
+
+    /**
+     * Update file details when a file completes loading
+     *
+     * @param {number} inputNum - The inputNum of the input which has finished loading
+     */
+    fileLoaded(inputNum) {
+        this.manager.tabs.updateInputTabProgress(inputNum, 100, 100);
+
+        const activeTab = this.manager.tabs.getActiveInputTab();
+        if (activeTab !== inputNum) return;
+
+        this.inputWorker.postMessage({
+            action: "setInput",
+            data: {
+                inputNum: inputNum,
+                silent: false
+            }
+        });
+
+        this.updateFileProgress(inputNum, 100);
     }
 
     /**
@@ -450,7 +476,7 @@ class InputWaiter {
      */
     resetFileThumb() {
         const fileThumb = document.getElementById("input-file-thumbnail");
-        fileThumb.src = require("../static/images/file-128x128.png");
+        fileThumb.src = require("../static/images/file-128x128.png").default;
     }
 
     /**
@@ -494,19 +520,6 @@ class InputWaiter {
         } else {
             fileLoaded.textContent = progress + "%";
             fileLoaded.style.color = "";
-        }
-
-        if (progress === 100 && progress !== oldProgress) {
-            // Don't set the input if the progress hasn't changed
-            this.inputWorker.postMessage({
-                action: "setInput",
-                data: {
-                    inputNum: inputNum,
-                    silent: false
-                }
-            });
-            window.dispatchEvent(this.manager.statechange);
-
         }
     }
 
@@ -668,7 +681,7 @@ class InputWaiter {
      * @param {event} e
      */
     debounceInputChange(e) {
-        this.app.debounce(this.inputChange, 50, "inputChange", this, [e])();
+        debounce(this.inputChange, 50, "inputChange", this, [e])();
     }
 
     /**
@@ -711,33 +724,52 @@ class InputWaiter {
      *
      * @param {event} e
      */
-    inputPaste(e) {
-        const pastedData = e.clipboardData.getData("Text");
-        if (pastedData.length < (this.app.options.ioDisplayThreshold * 1024)) {
-            // Pasting normally fires the inputChange() event before
-            // changing the value, so instead change it here ourselves
-            // and manually fire inputChange()
-            e.preventDefault();
-            const inputText = document.getElementById("input-text");
-            const selStart = inputText.selectionStart;
-            const selEnd = inputText.selectionEnd;
-            const startVal = inputText.value.slice(0, selStart);
-            const endVal = inputText.value.slice(selEnd);
+    async inputPaste(e) {
+        e.preventDefault();
+        e.stopPropagation();
 
-            inputText.value = startVal + pastedData + endVal;
-            inputText.setSelectionRange(selStart + pastedData.length, selStart + pastedData.length);
-            this.debounceInputChange(e);
-        } else {
-            e.preventDefault();
-            e.stopPropagation();
-
+        const self = this;
+        /**
+         * Triggers the input file/binary data overlay
+         *
+         * @param {string} pastedData
+         */
+        function triggerOverlay(pastedData) {
             const file = new File([pastedData], "PastedData", {
                 type: "text/plain",
                 lastModified: Date.now()
             });
 
-            this.loadUIFiles([file]);
+            self.loadUIFiles([file]);
+        }
+
+        const pastedData = e.clipboardData.getData("Text");
+        const inputText = document.getElementById("input-text");
+        const selStart = inputText.selectionStart;
+        const selEnd = inputText.selectionEnd;
+        const startVal = inputText.value.slice(0, selStart);
+        const endVal = inputText.value.slice(selEnd);
+        const val = startVal + pastedData + endVal;
+
+        if (val.length >= (this.app.options.ioDisplayThreshold * 1024)) {
+            // Data too large to display, use overlay
+            triggerOverlay(val);
             return false;
+        } else if (await this.preserveCarriageReturns(val)) {
+            // Data contains a carriage return and the user doesn't wish to edit it, use overlay
+            // We check this in a separate condition to make sure it is not run unless absolutely
+            // necessary.
+            triggerOverlay(val);
+            return false;
+        } else {
+            // Pasting normally fires the inputChange() event before
+            // changing the value, so instead change it here ourselves
+            // and manually fire inputChange()
+            inputText.value = val;
+            inputText.setSelectionRange(selStart + pastedData.length, selStart + pastedData.length);
+            // Don't debounce here otherwise the keyup event for the Ctrl key will cancel an autobake
+            // (at least for large inputs)
+            this.inputChange(e, true);
         }
     }
 
@@ -813,6 +845,44 @@ class InputWaiter {
             this.loadUIFiles(e.target.files);
             e.target.value = "";
         }
+    }
+
+    /**
+     * Checks if an input contains carriage returns.
+     * If a CR is detected, checks if the preserve CR option has been set,
+     * and if not, asks the user for their preference.
+     *
+     * @param {string} input - The input to be checked
+     * @returns {boolean} - If true, the input contains a CR which should be
+     *      preserved, so display an overlay so it can't be edited
+     */
+    async preserveCarriageReturns(input) {
+        if (input.indexOf("\r") < 0) return false;
+
+        const optionsStr = "This behaviour can be changed in the <a href='#' onclick='document.getElementById(\"options\").click()'>Options pane</a>";
+        const preserveStr = `A carriage return (\\r, 0x0d) was detected in your input. To preserve it, editing has been disabled.<br>${optionsStr}`;
+        const dontPreserveStr = `A carriage return (\\r, 0x0d) was detected in your input. It has not been preserved.<br>${optionsStr}`;
+
+        switch (this.app.options.preserveCR) {
+            case "always":
+                this.app.alert(preserveStr, 6000);
+                return true;
+            case "never":
+                this.app.alert(dontPreserveStr, 6000);
+                return false;
+        }
+
+        // Only preserve for high-entropy inputs
+        const data = Utils.strToArrayBuffer(input);
+        const entropy = Utils.calculateShannonEntropy(data);
+
+        if (entropy > 6) {
+            this.app.alert(preserveStr, 6000);
+            return true;
+        }
+
+        this.app.alert(dontPreserveStr, 6000);
+        return false;
     }
 
     /**

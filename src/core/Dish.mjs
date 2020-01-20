@@ -129,7 +129,7 @@ class Dish {
      *
      * @param {number} type - The data type of value, see Dish enums.
      * @param {boolean} [notUTF8=false] - Do not treat strings as UTF8.
-     * @returns {* | Promise} - (Broswer) A promise | (Node) value of dish in given type
+     * @returns {* | Promise} - (Browser) A promise | (Node) value of dish in given type
      */
     get(type, notUTF8=false) {
         if (typeof type === "string") {
@@ -177,7 +177,7 @@ class Dish {
         this.type = type;
 
         if (!this.valid()) {
-            const sample = Utils.truncate(JSON.stringify(this.value), 13);
+            const sample = Utils.truncate(JSON.stringify(this.value), 25);
             throw new DishError(`Data is not a valid ${Dish.enumLookup(type)}: ${sample}`);
         }
     }
@@ -191,7 +191,7 @@ class Dish {
      *
      * @param {number} type - The data type of value, see Dish enums.
      * @param {boolean} [notUTF8=false] - Do not treat strings as UTF8.
-     * @returns {Dish | Promise} - (Broswer) A promise | (Node) value of dish in given type
+     * @returns {Dish | Promise} - (Browser) A promise | (Node) value of dish in given type
      */
     presentAs(type, notUTF8=false) {
         const clone = this.clone();

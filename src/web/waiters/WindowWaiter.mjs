@@ -4,6 +4,8 @@
  * @license Apache-2.0
  */
 
+import { debounce } from "../../core/Utils.mjs";
+
 /**
  * Waiter to handle events related to the window object.
  */
@@ -25,13 +27,13 @@ class WindowWaiter {
      * continuous resetting).
      */
     windowResize() {
-        this.app.debounce(this.app.resetLayout, 200, "windowResize", this.app, [])();
+        debounce(this.app.resetLayout, 200, "windowResize", this.app, [])();
     }
 
 
     /**
      * Handler for window blur events.
-     * Saves the current time so that we can calculate how long the window was unfocussed for when
+     * Saves the current time so that we can calculate how long the window was unfocused for when
      * focus is returned.
      */
     windowBlur() {

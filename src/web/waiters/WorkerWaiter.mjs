@@ -5,8 +5,9 @@
  * @license Apache-2.0
  */
 
-import ChefWorker from "worker-loader?inline&fallback=false!../../core/ChefWorker";
-import DishWorker from "worker-loader?inline&fallback=false!../workers/DishWorker";
+import ChefWorker from "worker-loader?inline&fallback=false!../../core/ChefWorker.js";
+import DishWorker from "worker-loader?inline&fallback=false!../workers/DishWorker.mjs";
+import { debounce } from "../../core/Utils.mjs";
 
 /**
  * Waiter to handle conversations with the ChefWorker
@@ -281,7 +282,7 @@ class WorkerWaiter {
      */
     setBakingStatus(bakingStatus) {
         this.app.baking = bakingStatus;
-        this.app.debounce(this.manager.controls.toggleBakeButtonFunction, 20, "toggleBakeButton", this, [bakingStatus ? "cancel" : "bake"])();
+        debounce(this.manager.controls.toggleBakeButtonFunction, 20, "toggleBakeButton", this, [bakingStatus ? "cancel" : "bake"])();
 
         if (bakingStatus) this.manager.output.hideMagicButton();
     }
@@ -352,7 +353,7 @@ class WorkerWaiter {
      * @param {object} workerObj - Object containing the worker information
      * @param {ChefWorker} workerObj.worker - The actual worker object
      * @param {number} workerObj.inputNum - The inputNum of the input being baked by the worker
-     * @param {boolean} workerObj.active - If true, the worker is currrently baking an input
+     * @param {boolean} workerObj.active - If true, the worker is currently baking an input
      */
     workerFinished(workerObj) {
         const workerIdx = this.chefWorkers.indexOf(workerObj);

@@ -63,9 +63,9 @@ class DNSOverHTTPS extends Operation {
                 value: false
             },
             {
-                name: "Validate DNSSEC",
+                name: "Disable DNSSEC validation",
                 type: "boolean",
-                value: true
+                value: false
             }
         ];
     }
@@ -111,7 +111,7 @@ class DNSOverHTTPS extends Operation {
  * @returns {JSON}
  */
 function extractData(data) {
-    if (typeof(data) == "undefined"){
+    if (typeof(data) == "undefined") {
         return [];
     } else {
         const dataValues = [];

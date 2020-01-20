@@ -53,7 +53,7 @@ class BlurImage extends Operation {
     async run(input, args) {
         const [blurAmount, blurType] = args;
 
-        if (!isImage(new Uint8Array(input))) {
+        if (!isImage(input)) {
             throw new OperationError("Invalid file type.");
         }
 
@@ -64,7 +64,7 @@ class BlurImage extends Operation {
             throw new OperationError(`Error loading image. (${err})`);
         }
         try {
-            switch (blurType){
+            switch (blurType) {
                 case "Fast":
                     if (isWorkerEnvironment())
                         self.sendStatusMessage("Fast blurring image...");
